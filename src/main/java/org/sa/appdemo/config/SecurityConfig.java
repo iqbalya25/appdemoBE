@@ -36,15 +36,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Add CORS support
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("/api/auth/register").permitAll()
-                        .requestMatchers("/api/auth/logout").permitAll()
-                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()  // Allow all auth endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // Allow GET products
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
+                        .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll() // Allow GET categories
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -55,6 +55,7 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
