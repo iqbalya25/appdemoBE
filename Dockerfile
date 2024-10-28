@@ -1,30 +1,37 @@
 # Stage 1: Build
 FROM maven:3.9.7-sapmachine-21 AS build
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the Maven project files
+# Copy the Maven configuration files first
 COPY pom.xml .
+COPY .mvn/ .mvn/
+COPY mvnw .
+COPY mvnw.cmd .
+
+# Download all required dependencies into one layer
+RUN mvn dependency:go-offline -B
+
+# Copy source files
 COPY src ./src
 
 # Build the application
 RUN mvn clean package -DskipTests
 
+
 # Stage 2: Runtime
 FROM openjdk:21-slim
 
-# Set the working directory in the container
 WORKDIR /app
 
-LABEL maintainer="iqbal"
-LABEL company="appdemo"
-
-# Copy the jar file from the build stage
+# Copy the jar file from build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose the port the app runs on
+# Set environment variables
+ENV PORT=8080
+ENV SPRING_PROFILES_ACTIVE=prod
+
 EXPOSE 8080
 
-# Run the jar file
 ENTRYPOINT ["java","-jar","app.jar"]
