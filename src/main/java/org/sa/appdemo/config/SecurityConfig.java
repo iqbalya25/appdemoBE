@@ -43,7 +43,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()  // Allow all auth endpoints
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // Allow GET products
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
-                        .requestMatchers("/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll() // Allow GET categories
                         .anyRequest().authenticated()
                 )
